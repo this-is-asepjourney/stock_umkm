@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   Design System – StockUMKM by asepjourney
+   ========================================================= */
+
+@layer base {
+    :root {
+        --aj-indigo: 99 102 241;     /* #6366F1 */
+        --aj-purple: 168 85 247;     /* #A855F7 */
+        --aj-emerald: 16 185 129;    /* #10B981 */
+        --aj-amber: 245 158 11;      /* #F59E0B */
+        --aj-rose: 244 63 94;        /* #F43F5E */
+        --aj-ink: 15 23 42;          /* #0F172A */
+    }
+
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', 'Figtree', 'Inter', system-ui, sans-serif;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        letter-spacing: -0.01em;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.025em;
+    }
+
+    /* Ambient layered gradient background for authenticated app */
+    body.aj-app {
+        background-color: rgb(248 250 252);
+        background-image:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.06) 0, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    .dark body.aj-app {
+        background-color: rgb(2 6 23);
+        background-image:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.10) 0, transparent 50%),
+            radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.06) 0, transparent 50%);
+    }
+
+    /* Elegant scrollbar */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.25);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background-color: rgba(99, 102, 241, 0.5); }
+
+    /* Selection */
+    ::selection { background: rgba(99, 102, 241, 0.25); color: inherit; }
+}
+
+@layer components {
+    .aj-glass {
+        @apply bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/5;
+    }
+
+    .aj-card {
+        @apply bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-lg border border-gray-200/60 dark:border-gray-700/60 transition-all duration-300;
+    }
+
+    .aj-card-hover {
+        @apply hover:-translate-y-0.5 hover:shadow-xl hover:border-indigo-300/60 dark:hover:border-indigo-500/40;
+    }
+
+    .aj-btn {
+        @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900;
+    }
+    .aj-btn-primary {
+        @apply aj-btn bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-sm hover:shadow-md hover:shadow-indigo-500/30 hover:-translate-y-px active:translate-y-0 focus:ring-indigo-500;
+    }
+    .aj-btn-success {
+        @apply aj-btn bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-sm hover:shadow-md hover:shadow-emerald-500/30 hover:-translate-y-px focus:ring-emerald-500;
+    }
+    .aj-btn-danger {
+        @apply aj-btn bg-gradient-to-br from-rose-600 to-red-600 text-white shadow-sm hover:shadow-md hover:shadow-rose-500/30 focus:ring-rose-500;
+    }
+    .aj-btn-ghost {
+        @apply aj-btn text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/60 focus:ring-gray-400;
+    }
+    .aj-btn-outline {
+        @apply aj-btn border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-400 dark:hover:text-indigo-300 focus:ring-indigo-500;
+    }
+
+    .aj-input {
+        @apply w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800/80 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500/30 transition;
+    }
+
+    .aj-link { @apply text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline underline-offset-2; }
+
+    .aj-grad-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600;
+    }
+
+    .aj-ring-glow {
+        box-shadow:
+            0 0 0 1px rgba(99, 102, 241, 0.2),
+            0 8px 32px -8px rgba(99, 102, 241, 0.35);
+    }
+
+    .aj-divider {
+        @apply h-px bg-gradient-to-r from-transparent via-gray-300/60 dark:via-gray-700/60 to-transparent;
+    }
+
+    /* Animated mesh gradient for hero */
+    .aj-mesh {
+        background:
+            radial-gradient(at 20% 20%, rgba(99, 102, 241, 0.25) 0, transparent 50%),
+            radial-gradient(at 80% 10%, rgba(168, 85, 247, 0.20) 0, transparent 50%),
+            radial-gradient(at 80% 80%, rgba(16, 185, 129, 0.15) 0, transparent 50%),
+            radial-gradient(at 20% 80%, rgba(244, 63, 94, 0.12) 0, transparent 50%);
+    }
+
+    /* Subtle dot grid pattern */
+    .aj-dotgrid {
+        background-image: radial-gradient(circle, rgb(148 163 184 / 0.15) 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+    .dark .aj-dotgrid {
+        background-image: radial-gradient(circle, rgb(148 163 184 / 0.08) 1px, transparent 1px);
+    }
+
+    .aj-chip {
+        @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+
+    /* Animated border shimmer (dev signature) */
+    .aj-signature {
+        position: relative;
+        background: linear-gradient(110deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08), rgba(99,102,241,0.08));
+        background-size: 200% 100%;
+        animation: aj-shine 6s linear infinite;
+    }
+    @keyframes aj-shine {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    @keyframes aj-pulse-soft {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.75; }
+    }
+    .aj-pulse { animation: aj-pulse-soft 2.5s ease-in-out infinite; }
+
+    @keyframes aj-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    .aj-float { animation: aj-float 5s ease-in-out infinite; }
+
+    /* Print */
+    @media print {
+        nav, footer, .no-print { display: none !important; }
+        body { background: white !important; color: black !important; }
+    }
+
+    [x-cloak] { display: none !important; }
+}
