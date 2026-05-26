@@ -6,13 +6,26 @@ WORKDIR /app
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Install dependencies
+# Install dependencies without autoloader and scripts to leverage Docker caching
+RUN composer install \
+    --no-interaction \
+    --prefer-dist \
+    --no-dev \
+    --ignore-platform-reqs \
+    --no-scripts \
+    --no-autoloader
+
+# Copy application files to /app so that artisan and source files are present
+COPY . .
+
+# Generate optimized autoloader and run Laravel post-autoload-dump scripts
 RUN composer install \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
     --no-dev \
     --ignore-platform-reqs
+
 
 # Stage 2: Build Node.js dependencies (Frontend assets)
 FROM node:20 AS frontend
