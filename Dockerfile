@@ -84,6 +84,12 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
+# Build frontend assets in production image if missing (fallback)
+RUN if [ ! -d "public/build" ]; then \
+    npm install --legacy-peer-deps || true; \
+    npm run build || true; \
+fi
+
 # Copy vendor directory from vendor stage
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
