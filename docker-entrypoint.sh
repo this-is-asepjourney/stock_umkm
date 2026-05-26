@@ -15,6 +15,17 @@ if [ -z "$APP_KEY" ]; then
     fi
 fi
 
+# Check if public/build exists, if not build assets
+if [ ! -d "/var/www/html/public/build" ]; then
+    echo "⚠️  public/build directory not found. Building frontend assets..."
+    cd /var/www/html
+    npm install
+    npm run build
+    echo "✅ Frontend assets built successfully"
+else
+    echo "✅ Frontend assets already exist"
+fi
+
 # Run standard Laravel optimization commands
 echo "Optimizing application..."
 php artisan optimize:clear

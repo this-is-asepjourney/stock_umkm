@@ -41,16 +41,24 @@ RUN npm install
 # Copy application files needed for build
 COPY . .
 
-# Build frontend assets
-RUN npm run build
+# Build frontend assets - ensure public/build is created
+RUN npm run build && \
+    echo "✅ Build completed. Build directory structure:" && \
+    ls -la public/build/ || true
 
 # Stage 3: Setup Production Environment
 FROM php:8.3-apache
 
+# Install Node.js (needed for potential asset rebuilding at runtime)
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
-    curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
@@ -58,9 +66,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     sqlite3 \
     libsqlite3-dev
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
@@ -82,14 +87,16 @@ COPY . .
 # Copy vendor directory from vendor stage
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
-# Copy built frontend assets from frontend stage
+# Copy built frontend assets from frontend stage (if exists)
 # Note: In Laravel 11 with Vite, the build is usually in public/build
+RUN mkdir -p /var/www/html/public/build
 COPY --from=frontend /app/public/build/ /var/www/html/public/build/
 
 # Set permissions for Laravel storage and bootstrap cache
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod -R 755 /var/www/html/public/build
 
 # Copy custom entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
