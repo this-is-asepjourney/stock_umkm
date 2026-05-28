@@ -1,4 +1,7 @@
-# Stage 1: Build PHP dependencies
+```dockerfile
+# =========================================
+# Stage 1: Composer Dependencies
+# =========================================
 FROM composer:2.7 AS vendor
 
 WORKDIR /app
@@ -6,93 +9,81 @@ WORKDIR /app
 # Copy composer files
 COPY composer.json composer.lock ./
 
-# Install dependencies without autoloader and scripts to leverage Docker caching
+# Install dependencies
 RUN composer install \
-    --no-interaction \
-    --prefer-dist \
     --no-dev \
-    --ignore-platform-reqs \
-    --no-scripts \
-    --no-autoloader
-
-# Copy application files to /app so that artisan and source files are present
-COPY . .
-
-# Generate optimized autoloader and run Laravel post-autoload-dump scripts
-RUN composer install \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
-    --no-dev \
     --ignore-platform-reqs
 
+# Copy all application files
+COPY . .
 
-# Stage 2: Build Node.js dependencies (Frontend assets)
+# Regenerate optimized autoload
+RUN composer dump-autoload --optimize
+
+
+# =========================================
+# Stage 2: Frontend Build
+# =========================================
 FROM node:20 AS frontend
 
 WORKDIR /app
 
-# Copy package.json and related files
-COPY package.json package-lock.json* vite.config.js tailwind.config.js postcss.config.js ./
+# Copy package files
+COPY package*.json ./
 
-# Install npm dependencies
+# Install node modules
 RUN npm install
 
-# Copy application files needed for build
+# Copy app files
 COPY . .
 
-# Build frontend assets - ensure public/build is created
-RUN npm run build && \
-    echo "✅ Build completed. Build directory structure:" && \
-    ls -la public/build/ || true
+# Build Vite assets
+RUN npm run build
 
-# Stage 3: Setup Production Environment
+
+# =========================================
+# Stage 3: Production Image
+# =========================================
 FROM php:8.3-apache
-
-# Install Node.js (needed for potential asset rebuilding at runtime)
-RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
+    curl \
     zip \
     unzip \
     sqlite3 \
-    libsqlite3-dev
+    libsqlite3-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_sqlite \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
-
-# Enable Apache modules for Laravel routing and proper asset serving
+# Enable Apache modules
 RUN a2enmod rewrite headers
 
-# Configure Apache DocumentRoot to point to Laravel's public directory
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+# Set Apache document root
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# Create a proper VirtualHost config with AllowOverride and Directory permissions
-RUN echo '<VirtualHost *:80>\n\
-    ServerAdmin webmaster@localhost\n\
-    DocumentRoot /var/www/html/public\n\
-    \n\
-    <Directory /var/www/html/public>\n\
-        Options Indexes FollowSymLinks\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-    \n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
-
-# Also ensure apache2.conf allows .htaccess overrides for /var/www
-RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
+# Configure Apache
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/*.conf \
+    /etc/apache2/apache2.conf
 
 # Set working directory
 WORKDIR /var/www/html
@@ -100,37 +91,35 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Build frontend assets in production image if missing (fallback)
-RUN if [ ! -d "public/build" ]; then \
-    npm install --legacy-peer-deps || true; \
-    npm run build || true; \
-fi
+# Copy vendor from composer stage
+COPY --from=vendor /app/vendor ./vendor
 
-# Copy vendor directory from vendor stage
-COPY --from=vendor /app/vendor/ /var/www/html/vendor/
+# Copy frontend build
+COPY --from=frontend /app/public/build ./public/build
 
-# Copy built frontend assets from frontend stage (if exists)
-# Note: In Laravel 11 with Vite, the build is usually in public/build
-RUN mkdir -p /var/www/html/public/build
-COPY --from=frontend /app/public/build/ /var/www/html/public/build/
+# Laravel permissions
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Set permissions for Laravel storage and bootstrap cache
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache \
-    && chmod -R 755 /var/www/html/public/build
+# Create .env if missing
+RUN cp .env.example .env || true
 
-# Copy custom entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh
+# Generate Laravel APP_KEY
+RUN php artisan key:generate || true
 
+# Optimize Laravel
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
 
-# Expose port 80
+# Expose Apache
 EXPOSE 80
 
-# Use the entrypoint script
-ENTRYPOINT ["docker-entrypoint.sh"]
-
-# Start Apache in foreground
+# Start Apache
 CMD ["apache2-foreground"]
+```
