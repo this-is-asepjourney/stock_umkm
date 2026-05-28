@@ -1,4 +1,4 @@
-gitignore
+```gitignore
 /vendor
 /node_modules
 /storage/logs
@@ -8,4 +8,4 @@ gitignore
 .env
 .git
 docker-compose.yml
-
+```

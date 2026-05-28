@@ -3,7 +3,7 @@
 # Stage 1: Composer Dependencies
 # =========================================
 FROM composer:2.7 AS vendor
-
+FROM php:8.3-apache
 WORKDIR /app
 
 # Copy composer files
@@ -116,6 +116,10 @@ RUN php artisan key:generate || true
 RUN php artisan config:cache || true
 RUN php artisan route:cache || true
 RUN php artisan view:cache || true
+
+# Laravel storage link
+RUN php artisan storage:link || true
+
 
 # Expose Apache
 EXPOSE 80
