@@ -28,6 +28,9 @@ RUN composer install \
 # Copy all application files
 COPY . .
 
+# Create required directories for Laravel discovery scripts
+RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions bootstrap/cache
+
 # Regenerate optimized autoload
 RUN composer dump-autoload --optimize
 
