@@ -3,7 +3,7 @@
 # Stage 1: Composer Dependencies
 # =========================================
 FROM composer:2.7 AS vendor
-FROM php:8.3-apache
+
 WORKDIR /app
 
 # Copy composer files
