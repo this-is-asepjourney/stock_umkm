@@ -2,7 +2,10 @@
 # =========================================
 # Stage 1: Composer Dependencies
 # =========================================
-FROM composer:2.7 AS vendor
+FROM php:8.4-cli AS vendor
+
+# Copy Composer binary
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
@@ -48,7 +51,7 @@ RUN npm run build
 # =========================================
 # Stage 3: Production Image
 # =========================================
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
