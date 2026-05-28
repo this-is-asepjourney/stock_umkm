@@ -1,8 +1,12 @@
-
 # =========================================
 # Stage 1: Composer Dependencies
 # =========================================
 FROM php:8.4-cli AS vendor
+
+# Install system dependencies required for Composer
+RUN apt-get update && apt-get install -y git unzip libzip-dev \
+    && docker-php-ext-install zip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy Composer binary
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -108,26 +112,14 @@ RUN mkdir -p storage/framework/cache \
     storage/logs \
     bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
-# Create .env if missing
-RUN cp .env.example .env || true
-
-# Generate Laravel APP_KEY
-RUN php artisan key:generate || true
-
-# Optimize Laravel
-RUN php artisan config:cache || true
-RUN php artisan route:cache || true
-RUN php artisan view:cache || true
-
-# Laravel storage link
-RUN php artisan storage:link || true
-
+    && chmod -R 775 storage bootstrap/cache \
+    && chmod +x docker-entrypoint.sh
 
 # Expose Apache
 EXPOSE 80
 
+# Use the entrypoint script to prepare the environment dynamically at runtime
+ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
+
 # Start Apache
 CMD ["apache2-foreground"]
-

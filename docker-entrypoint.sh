@@ -27,8 +27,8 @@ else
 fi
 
 # Run standard Laravel optimization commands
-echo "Optimizing application..."
-php artisan optimize:clear
+echo "Optimizing application for production..."
+php artisan optimize
 
 # Create storage link if it doesn't exist
 echo "Creating storage link..."
