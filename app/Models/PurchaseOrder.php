@@ -25,7 +25,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class PurchaseOrder extends Model
 {
+    use \App\Traits\BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'supplier_id',
         'user_id',
         'location_id',

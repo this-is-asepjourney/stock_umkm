@@ -26,7 +26,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class StockOpname extends Model
 {
+    use \App\Traits\BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'user_id',
         'location_id',
         'category_id',

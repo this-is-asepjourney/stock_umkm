@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use App\Traits\BelongsToCompany;
 
 class Location extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'parent_id',
         'name',
         'code',

@@ -38,6 +38,31 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's company information.
+     */
+    public function updateCompany(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'company_name' => ['required', 'string', 'max:255'],
+            'company_email' => ['nullable', 'string', 'email', 'max:255'],
+            'company_phone' => ['nullable', 'string', 'max:255'],
+            'company_address' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $user = $request->user();
+        if ($user->company) {
+            $user->company->update([
+                'name' => $request->company_name,
+                'email' => $request->company_email,
+                'phone' => $request->company_phone,
+                'address' => $request->company_address,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'company-updated');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

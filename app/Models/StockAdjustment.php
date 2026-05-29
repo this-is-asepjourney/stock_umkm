@@ -22,7 +22,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class StockAdjustment extends Model
 {
+    use \App\Traits\BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'stock_opname_item_id',
         'product_id',
         'user_id',

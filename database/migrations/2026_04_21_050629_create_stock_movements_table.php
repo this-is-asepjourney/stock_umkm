@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained();
             $table->foreignId('location_id')->nullable()->constrained();
             $table->foreignId('user_id')->constrained();

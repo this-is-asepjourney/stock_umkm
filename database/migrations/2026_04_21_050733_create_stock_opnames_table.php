@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('location_id')->nullable()->constrained()->onDelete('set null');

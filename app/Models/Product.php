@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Traits\BelongsToCompany;
 
 class Product extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'category_id',
         'unit_id',
         'supplier_id',
