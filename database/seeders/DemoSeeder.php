@@ -21,13 +21,8 @@ class DemoSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::query()->first() ?? User::create([
-            'name' => 'Demo Admin',
-            'email' => 'demo@stock-umkm.test',
-            'password' => Hash::make('password'),
-        ]);
-
-        auth()->setUser($user);
+        // User is already created and authenticated in DatabaseSeeder
+        $user = auth()->user();
 
         $supplier = Supplier::query()->first();
         $location = Location::query()->first();
