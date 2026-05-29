@@ -13,6 +13,7 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -72,6 +73,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.company.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
+    Route::put('/company', [CompanyController::class, 'update'])->name('company.update');
+    Route::post('/company/add-member', [CompanyController::class, 'addMember'])->name('company.add-member');
+    Route::delete('/company/remove-member/{member}', [CompanyController::class, 'removeMember'])->name('company.remove-member');
 });
 
 require __DIR__ . '/auth.php';

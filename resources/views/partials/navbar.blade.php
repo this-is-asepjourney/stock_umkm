@@ -146,6 +146,7 @@
                             </div>
                             <div class="py-1">
                                 <a href="{{ route('profile.edit') }}" class="{{ $dropItem }}"><span>👤</span> Profil Saya</a>
+                                <a href="{{ route('company.index') }}" class="{{ $dropItem }}"><span>🏢</span> Manage Company</a>
                                 <a href="{{ route('settings.index') }}" class="{{ $dropItem }}"><span>⚙️</span> Pengaturan</a>
                             </div>
                             <div class="border-t border-gray-200/60 dark:border-white/5 pt-1">
@@ -202,6 +203,7 @@
 
                 <div class="aj-divider my-2"></div>
                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">👤 Profil</a>
+                <a href="{{ route('company.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">🏢 Manage Company</a>
                 <a href="{{ route('settings.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">⚙️ Pengaturan</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

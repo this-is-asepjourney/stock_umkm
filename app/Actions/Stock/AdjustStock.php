@@ -7,6 +7,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AdjustStock
 {
@@ -53,7 +54,7 @@ class AdjustStock
         $adjustment = StockAdjustment::create([
             'stock_opname_item_id' => $item->id,
             'product_id' => $item->product_id,
-            'user_id' => auth()->id() ?? $opname->user_id,
+            'user_id' => Auth::id() ?? $opname->user_id,
             'approved_by' => $approvedBy,
             'approved_at' => $approvedBy ? now() : null,
             'type' => $type,
