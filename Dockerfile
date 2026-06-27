@@ -16,6 +16,10 @@ WORKDIR /app
 # Copy composer files
 COPY composer.json composer.lock ./
 
+# Set Composer environment variables to prevent root warnings and memory limits
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_MEMORY_LIMIT=-1
+
 # Install dependencies
 RUN composer install \
     --no-dev \
