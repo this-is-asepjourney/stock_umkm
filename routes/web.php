@@ -14,15 +14,21 @@ use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminCompanyController;
+use App\Http\Controllers\Admin\AdminPlanController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', fn () => view('home'))->name('home');
 Route::get('/pricing', fn () => view('pricing'))->name('pricing');
 Route::get('/contact', fn () => view('contact'))->name('contact');
+Route::get('/subscription-expired', fn () => view('subscription_expired'))->name('subscription.expired');
 
 // Authenticated Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'subscription'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -79,4 +85,37 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/company/remove-member/{member}', [CompanyController::class, 'removeMember'])->name('company.remove-member');
 });
 
+// ============================================================
+// Admin Panel Routes
+// ============================================================
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Admin Auth (guest only)
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+    // Protected admin routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/', fn () => redirect()->route('admin.dashboard'));
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // User Management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Company Monitoring & Subscription
+        Route::get('/companies', [AdminCompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/{company}', [AdminCompanyController::class, 'show'])->name('companies.show');
+        Route::get('/companies/{company}/edit', [AdminCompanyController::class, 'edit'])->name('companies.edit');
+        Route::put('/companies/{company}', [AdminCompanyController::class, 'update'])->name('companies.update');
+
+        // Plan Management
+        Route::resource('plans', AdminPlanController::class);
+    });
+});
+
 require __DIR__ . '/auth.php';
+
