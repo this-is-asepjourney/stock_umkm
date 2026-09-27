@@ -64,6 +64,15 @@ return [
             ]) : [],
         ],
 
+        'd1' => [
+            'driver' => 'd1',
+            'prefix' => '',
+            'database' => env('CLOUDFLARE_DATABASE_ID', ''),
+            'account_id' => env('CLOUDFLARE_ACCOUNT_ID', ''),
+            'token' => env('CLOUDFLARE_API_TOKEN', ''),
+            'timeout' => 60,
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
