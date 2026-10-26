@@ -95,10 +95,11 @@ RUN a2enmod rewrite headers
 # Set Apache document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# Configure Apache
+# Configure Apache (Document Root and Port 8080)
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf \
-    /etc/apache2/apache2.conf
+    /etc/apache2/apache2.conf \
+    && sed -ri -e 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
 
 # Set working directory
 WORKDIR /var/www/html
@@ -122,8 +123,8 @@ RUN mkdir -p storage/framework/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chmod +x docker-entrypoint.sh
 
-# Expose Apache
-EXPOSE 80
+# Expose Apache on port 8080
+EXPOSE 8080
 
 # Use the entrypoint script to prepare the environment dynamically at runtime
 ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
